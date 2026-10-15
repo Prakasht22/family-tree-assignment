@@ -12,7 +12,7 @@ typedef struct Person {
 
 void link_parents(Person *child, Person *father, Person *mother);
 void print_family_relationships(const Person *me);
-
+void free_family_tree(Person *people[], int count);
 
 Person* create_person(const char *name, int age)
 {
@@ -103,9 +103,28 @@ int main(void)
     read_person_info("Yourself", name, &age);
     me = create_person(name, age);
 
+if (paternal_grandfather == NULL ||
+    paternal_grandmother == NULL ||
+    maternal_grandfather == NULL ||
+    maternal_grandmother == NULL ||
+    father == NULL ||
+    mother == NULL ||
+    me == NULL) {
+
+    printf("Error: Unable to create the complete family tree.\n");
+
+    free(paternal_grandfather);
+    free(paternal_grandmother);
+    free(maternal_grandfather);
+    free(maternal_grandmother);
+    free(father);
+    free(mother);
+    free(me);
+
+    return 1;
+}
 
     printf("\nAll 7 family members have been entered!\n");
-
 
     link_parents(me, father, mother);
     link_parents(father, paternal_grandfather, paternal_grandmother);
@@ -139,4 +158,13 @@ void print_family_relationships(const Person *me)
            me->mother->father->name, me->mother->father->age);
     printf("Grandmother: %s (Age: %d)\n",
            me->mother->mother->name, me->mother->mother->age);
+}
+
+void free_family_tree(Person *people[], int count)
+{
+    for (int i = 0; i < count; i++) {
+        free(people[i]);
+    }
+
+    printf("\nMemory cleanup completed successfully!\n");
 }
