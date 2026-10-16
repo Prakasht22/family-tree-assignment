@@ -13,6 +13,7 @@ typedef struct Person {
 void link_parents(Person *child, Person *father, Person *mother);
 void print_family_relationships(const Person *me);
 void free_family_tree(Person *people[], int count);
+void print_tree_visual(const Person *root, int level);
 
 Person* create_person(const char *name, int age)
 {
@@ -47,13 +48,10 @@ void read_person_info(const char *role, char *name_out, int *age_out)
     printf("Enter name of %s: ", role);
     fgets(name_out, 50, stdin);
 
-
     name_out[strcspn(name_out, "\n")] = '\0';
-
 
     printf("Enter age of %s: ", role);
     scanf("%d", age_out);
-
 
     getchar();
 }
@@ -132,6 +130,18 @@ if (paternal_grandfather == NULL ||
 
     print_family_relationships(me);
 
+     printf("\n=== VISUAL FAMILY TREE ===\n");
+    print_tree_visual(me, 0);
+
+    
+    Person *all_people[] = {
+        paternal_grandfather, paternal_grandmother,
+        maternal_grandfather, maternal_grandmother,
+        father, mother, me
+    };
+    free_family_tree(all_people, 7);
+
+
     return 0;
 }
 
@@ -160,6 +170,41 @@ void print_family_relationships(const Person *me)
            me->mother->mother->name, me->mother->mother->age);
 }
 
+void print_tree_visual(const Person *root, int level)
+{
+    if (root == NULL) {
+        return;
+    }
+
+    if (level == 0) {
+        printf("%s (Age: %d)\n", root->name, root->age);
+    } else {
+        if (level == 1) {
+            if (root == root->mother) {
+                printf("└── ");
+            } 
+        } else if (level == 2) {
+            printf("│   ├── ");
+        }
+    }
+
+    if (level == 0) {
+        printf("├── Father: ");
+        print_tree_visual(root->father, 1);
+        printf("└── Mother: ");
+        print_tree_visual(root->mother, 1);
+    } 
+    else if (level == 1) {
+        printf("%s (Age: %d)\n", root->name, root->age);
+        
+        if (root->father != NULL) {
+            printf("│   ├── Grandfather: %s (Age: %d)\n", root->father->name, root->father->age);
+        }
+        if (root->mother != NULL) {
+            printf("│   └── Grandmother: %s (Age: %d)\n", root->mother->name, root->mother->age);
+        }
+    }
+}
 void free_family_tree(Person *people[], int count)
 {
     for (int i = 0; i < count; i++) {
